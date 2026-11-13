@@ -1,0 +1,41 @@
+name: Build Rush POS exe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  win:
+    runs-on: windows-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Windows exe
+        run: npm run dist
+
+      - name: Upload exe (Actions > run > Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rush-POS-Pro-exe
+          path: dist/*.exe
+          if-no-files-found: error
+
+      - name: Publish release (only when you push a tag like v8.6.4)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.exe
