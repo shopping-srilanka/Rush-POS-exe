@@ -1,0 +1,16 @@
+version: 1.0.{build}
+image: Visual Studio 2022
+platform: x64
+
+build: off
+
+install:
+  - ps: Install-Product node 20 x64
+  - cmd: cd rush-pos-desktop && npm install
+
+build_script:
+  - cmd: cd rush-pos-desktop && npm run dist
+
+artifacts:
+  - path: rush-pos-desktop\dist\*.exe
+    name: Rush-POS-EXE
